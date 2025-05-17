@@ -5,8 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BezierDemo"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="BezierDemo" Height="600" Width="800">
     <Grid>
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Canvas x:Name="canvas" Grid.Row="0" Margin="10"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+            <Button Content="Clear" Width="100" Height="30" Margin="5" Click="ClearButton_Click"/>
+        </StackPanel>
     </Grid>
 </Window>
