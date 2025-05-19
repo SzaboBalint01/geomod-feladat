@@ -23,6 +23,7 @@ namespace BezierDemo
             canvas.MouseMove += Canvas_MouseMove;
             canvas.MouseLeftButtonUp += Canvas_MouseLeftButtonUp;
             DrawLine();
+            DrawBezierPath();
         }
 
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -45,6 +46,7 @@ namespace BezierDemo
             }
             AddControlPoint(clickPoint);
             UpdateLine();
+            UpdateBezierCurve();
         }
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
@@ -56,6 +58,7 @@ namespace BezierDemo
                 Canvas.SetTop(selectedPoint, mousePos.Y - selectedPoint.Height / 2);
                 controlPoints[selectedIndex] = mousePos;
                 UpdateLine();
+                UpdateBezierCurve();
                 if (canvas.Children[canvas.Children.IndexOf(selectedPoint) + 1] is TextBlock label)
                 {
                     Canvas.SetLeft(label, mousePos.X + 10);
@@ -118,6 +121,7 @@ namespace BezierDemo
             controlPointShapes.Clear();
             controlPolyline.Points.Clear();
             DrawLine();
+            DrawBezierPath();
         }
 
         private void DrawLine()
@@ -131,10 +135,58 @@ namespace BezierDemo
             canvas.Children.Add(controlPolyline);
         }
 
+        private void DrawBezierPath()
+        {
+            bezierPath = new Path
+            {
+                Stroke = Brushes.Blue,
+                StrokeThickness = 2
+            };
+            canvas.Children.Add(bezierPath);
+        }
+
+        private void UpdateBezierCurve()
+        {
+            if (controlPoints.Count < 2)
+            {
+                return;
+            }
+            PathGeometry pathGeometry = new PathGeometry();
+            PathFigure pathFigure = new PathFigure();
+            pathFigure.StartPoint = controlPoints[0];
+            PolyLineSegment polySegment = new PolyLineSegment();
+            pathFigure.Segments.Add(polySegment);
+            for (double t = 0; t <= 1.0; t += 1.0 / STEPS)
+            {
+                Point point = CalculateBezierPoint(controlPoints, t);
+                polySegment.Points.Add(point);
+            }
+            pathGeometry.Figures.Add(pathFigure);
+            bezierPath.Data = pathGeometry;
+        }
+
+        private Point CalculateBezierPoint(List<Point> controlPoints, double t)
+        {
+            List<Point> tempControlPoints = new List<Point>(controlPoints);
+            int numberOfPoints = tempControlPoints.Count;
+            for (int recursionLevel = 1; recursionLevel < numberOfPoints; recursionLevel++)
+            {
+                for (int i = 0; i < numberOfPoints - recursionLevel; i++)
+                {
+                    double calculatedX = (1 - t) * tempControlPoints[i].X + t * tempControlPoints[i + 1].X;
+                    double calculatedY = (1 - t) * tempControlPoints[i].Y + t * tempControlPoints[i + 1].Y;
+                    tempControlPoints[i] = new Point(calculatedX, calculatedY);
+                }
+            }
+            return tempControlPoints[0];
+        }
+
         private List<Point> controlPoints = new List<Point>();
         private List<Ellipse> controlPointShapes = new List<Ellipse>();
         private Polyline controlPolyline;
         private Ellipse selectedPoint = null;
         private int selectedIndex = -1;
+        private Path bezierPath;
+        private const int STEPS = 100;
     }
 }
