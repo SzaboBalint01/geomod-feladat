@@ -156,8 +156,9 @@ namespace BezierDemo
             pathFigure.StartPoint = controlPoints[0];
             PolyLineSegment polySegment = new PolyLineSegment();
             pathFigure.Segments.Add(polySegment);
-            for (double t = 0; t <= 1.0; t += 1.0 / STEPS)
+            for (int i = 1; i <= STEPS; i++)
             {
+                double t = (double)i / STEPS;
                 Point point = CalculateBezierPoint(controlPoints, t);
                 polySegment.Points.Add(point);
             }
