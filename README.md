@@ -22,3 +22,22 @@ A szürke szaggatott vonal a kontrollpontokat összekötő segédvonalat mutatja
 
 ### Pontok törlése
 A "Clear" gombra kattintva az összes pont törlésre kerül.
+
+## Változások
+
+### **Javítva**: A görbe magasabb fokszám esetén nem mindig ér el az utolsó kontrollponthoz
+
+**Probléma**: Magasabb fokszámok esetén az eredeti ciklus utolsó iterációjánál a `t` értéke gyakran több volt, mint `1.0`. Ezt a `t += 1.0/STEPS` művelet okozta.
+
+**Megoldás**: Egész szám alapú iterációra cseréltem (`for (int i = 1; i <= STEPS; i++)`), így a görbe mindig pontosan eléri a `t = 1.0` értéket és megfelelően csatlakozik az utolsó kontrollponthoz.
+
+```csharp
+// Eredeti
+for (double t = 0; t <= 1.0; t += 1.0 / STEPS)
+
+// Javított
+for (int i = 1; i <= STEPS; i++)
+{
+   double t = (double)i / STEPS;
+   // ...
+}
